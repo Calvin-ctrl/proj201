@@ -5,6 +5,7 @@
 
 # Local Modules
 import parser
+import re
 
 def displayDicts(dict):
     for course, conditions in dict.items():
@@ -20,6 +21,41 @@ def formatCourses(dict):
         temp = temp.replace("or","|").replace("and","&")
         courses[a[0]] = temp
     return courses
+import re
+name={"ENS722":"ACC201","ENS205":"ENS203","ENS204":"(ENS207&ENS207)|(ENS722)","ENS207":"(PROJ201&PROJ201)"}
+def displayCourses(array):
+    for course, conditions in array.items():
+        print(f"{course} : {conditions}")
+
+        
+#function to find errors (if prerequesities don't exist in catalog)
+def findingErrors(dict):
+  errors={}
+  checker=0
+  for course, conditions in dict.items():
+    if conditions not in dict.keys():
+      if "|" in conditions or "&" in conditions:
+        conditions= re.findall(r"[\w']+", conditions)
+        checker=1
+        for condition in conditions:
+          if condition not in dict.keys():
+            errors[course]=conditions
+            break
+      if checker == 0:
+        errors[course]=conditions
+  return errors
+
+
+#function to find errors (if prerequisites repeat itself in one course)
+def findingDuplicates(dict):
+  duplicates={}
+  for course, conditions in dict.items():
+    if "|" in conditions or "&" in conditions:
+      conditions= re.findall(r"[\w']+", conditions)
+      if conditions[0]==conditions[1]:
+        duplicates[course]=conditions
+  return duplicates
+  
 
 # Find Imminent Dependencies
 def findDependencies(dict):
@@ -33,9 +69,13 @@ def findDependencies(dict):
 def main():
     output = parser.getPickle(parser.PICKLE_NAME)
     courses = formatCourses(output)
-
     dependencies = findDependencies(courses)
     displayDicts(dependencies)
+    
+    print('Courses containing prerequesite(s) that don\'t exist in Catalog: ')
+    displayDicts(findingErrors(courses))
+    print('Courses containing duplicates in "Prerequesite" sections: ')
+    displayDicts(findingDuplicates(courses))
 
 if __name__ == "__main__":
     main()
