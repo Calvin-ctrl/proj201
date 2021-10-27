@@ -21,13 +21,7 @@ def formatCourses(dict):
         temp = temp.replace("or","|").replace("and","&")
         courses[a[0]] = temp
     return courses
-import re
-name={"ENS722":"ACC201","ENS205":"ENS203","ENS204":"(ENS207&ENS207)|(ENS722)","ENS207":"(PROJ201&PROJ201)"}
-def displayCourses(array):
-    for course, conditions in array.items():
-        print(f"{course} : {conditions}")
 
-        
 #function to find errors (if prerequesities don't exist in catalog)
 def findingErrors(dict):
   errors={}
